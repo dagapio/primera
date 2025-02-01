@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReformaMax - Expertos en Reformas</title>
+    <title>ReformaMax - Verificación de QR</title>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GRMETTXDL0"></script>
@@ -14,46 +14,6 @@
       gtag('config', 'G-GRMETTXDL0');
     </script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Lista de códigos válidos de un solo uso
-            let codigosValidos = ["A1B2C3", "X9Y8Z7", "QWERTY", "PASS123", "UNIQUE5"];
-
-            // Recuperar códigos usados desde localStorage
-            let codigosUsados = JSON.parse(localStorage.getItem("codigosUsados")) || [];
-
-            let intentos = 3; // Número de intentos permitidos
-
-            function pedirCodigo() {
-                let codigoIngresado = prompt("Ingrese su código de acceso:");
-
-                if (codigoIngresado === null) {
-                    document.body.innerHTML = "<h1>Acceso denegado</h1>";
-                    return;
-                }
-
-                if (codigosValidos.includes(codigoIngresado) && !codigosUsados.includes(codigoIngresado)) {
-                    // Guardar el código como usado
-                    codigosUsados.push(codigoIngresado);
-                    localStorage.setItem("codigosUsados", JSON.stringify(codigosUsados));
-
-                    document.getElementById("contenido").style.display = "block"; // Mostrar la página
-                } else {
-                    intentos--;
-                    if (intentos > 0) {
-                        alert("Código incorrecto o ya utilizado. Intentos restantes: " + intentos);
-                        pedirCodigo();
-                    } else {
-                        alert("Demasiados intentos fallidos. Acceso denegado.");
-                        document.body.innerHTML = "<h1>Acceso denegado</h1>";
-                    }
-                }
-            }
-
-            pedirCodigo();
-        });
-    </script>
-
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -61,131 +21,50 @@
             padding: 0;
             background-color: #ffffff;
             color: #1E3A5F;
-            line-height: 1.6;
-        }
-        #contenido {
-            display: none; /* Ocultar el contenido hasta que el usuario ingrese el código */
-        }
-        header {
-            background-color: #ffffff;
-            color: #1E3A5F;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #ddd;
-        }
-        header img {
-            height: auto;
-            max-height: 60px;
-            width: auto;
-        }
-        nav ul {
-            list-style: none;
-            padding: 0;
-            display: flex;
-            gap: 20px;
-        }
-        nav ul li a {
-            color: #1E3A5F;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease-in-out;
-        }
-        nav ul li a:hover {
-            color: #FF8C42;
-        }
-        .hero {
-            padding: 4rem 2rem;
             text-align: center;
-        }
-        .hero h2 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .hero p {
-            font-size: 1.2rem;
-            color: #555;
         }
         .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
         }
-        section {
-            padding: 3rem 2rem;
-            text-align: center;
+        .winner {
+            color: green;
+            font-weight: bold;
         }
-        .btn {
-            display: inline-block;
-            background-color: #1E3A5F;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        .btn:hover {
-            background-color: #FF8C42;
-        }
-        form input, form textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        footer {
-            background-color: #ffffff;
-            color: #1E3A5F;
-            text-align: center;
-            padding: 1rem;
-            border-top: 1px solid #ddd;
+        .loser {
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div id="contenido">
-        <header>
-            <img src="logo.webp" alt="ReformaMax Logo" width="150">
-            <nav>
-                <ul>
-                    <li><a href="#inicio">Inicio</a></li>
-                    <li><a href="#servicios">Servicios</a></li>
-                    <li><a href="#nosotros">Nosotros</a></li>
-                    <li><a href="#contacto">Contacto</a></li>
-                </ul>
-            </nav>
-        </header>
-        
-        <section id="inicio" class="hero">
-            <h2>Transformamos tu espacio con calidad y profesionalismo</h2>
-            <p>Expertos en reformas de hogares y negocios.</p>
-        </section>
-        
-        <section id="servicios" class="container">
-            <h2>Nuestros Servicios</h2>
-            <p>Reformas integrales, renovación de cocinas y baños, pintura y más.</p>
-        </section>
-        
-        <section id="nosotros" class="container">
-            <h2>Sobre Nosotros</h2>
-            <p>ReformaMax es una empresa con años de experiencia en reformas. Calidad y compromiso en cada proyecto.</p>
-        </section>
-        
-        <section id="contacto" class="container">
-            <h2>Contacto</h2>
-            <form>
-                <input type="text" id="nombre" name="nombre" placeholder="Nombre" required>
-                <input type="email" id="email" name="email" placeholder="Correo Electrónico" required>
-                <textarea id="mensaje" name="mensaje" placeholder="Mensaje" required></textarea>
-                <button type="submit" class="btn">Enviar</button>
-            </form>
-        </section>
-        
-        <footer>
-            <p>&copy; 2025 ReformaMax - Todos los derechos reservados</p>
-        </footer>
+    <div class="container">
+        <h1>Verificación de Código QR</h1>
+        <p id="message">Verificando...</p>
     </div>
+
+    <script>
+        // Lista de IDs ganadores
+        const ganadores = ["005", "012", "027", "038", "049"];
+        
+        // Obtener el ID de la URL
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get("id");
+        const messageElement = document.getElementById("message");
+        
+        if (id) {
+            if (ganadores.includes(id)) {
+                messageElement.innerHTML = `<p class='winner'>¡Felicidades! El código ${id} es ganador. Reclama tu premio.</p>`;
+            } else {
+                messageElement.innerHTML = `<p class='loser'>Lo sentimos, el código ${id} no es ganador. ¡Gracias por participar!</p>`;
+            }
+        } else {
+            messageElement.innerHTML = "Código QR no válido.";
+        }
+    </script>
 </body>
 </html>
