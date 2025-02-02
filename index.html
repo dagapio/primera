@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReformaMax - Verificación de QR</title>
+    <title>ReformaMax - Chatbot</title>
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GRMETTXDL0"></script>
@@ -21,49 +21,154 @@
             padding: 0;
             background-color: #ffffff;
             color: #1E3A5F;
-            text-align: center;
         }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ccc;
+        
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: white;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+            overflow: hidden;
+            display: none;
         }
-        .winner {
-            color: green;
+        
+        .chatbot-header {
+            background: #1E3A5F;
+            color: white;
+            padding: 10px;
+            text-align: center;
             font-weight: bold;
+            cursor: pointer;
         }
-        .loser {
-            color: red;
-            font-weight: bold;
+        
+        .chatbot-messages {
+            height: 250px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .chatbot-input {
+            display: flex;
+            border-top: 1px solid #ccc;
+        }
+        
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+        }
+        
+        .chatbot-input button {
+            padding: 10px;
+            background: #1E3A5F;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .chatbot-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1E3A5F;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Verificación de Código QR</h1>
-        <p id="message">Verificando...</p>
+    <div class="chatbot-button" onclick="toggleChatbot()">💬 Chat</div>
+    
+    <div class="chatbot-container" id="chatbot">
+        <div class="chatbot-header" onclick="toggleChatbot()">Chat de Atención</div>
+        <div class="chatbot-messages" id="chatbot-messages"></div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbot-input" placeholder="Escribe un mensaje...">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
     </div>
-
+    
     <script>
-        // Lista de IDs ganadores
-        const ganadores = ["005", "012", "027", "038", "049"];
+        let awaitingEmail = false;
+        let awaitingQuestion = false;
+        let userEmail = "";
         
-        // Obtener el ID de la URL
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get("id");
-        const messageElement = document.getElementById("message");
-        
-        if (id) {
-            if (ganadores.includes(id)) {
-                messageElement.innerHTML = `<p class='winner'>¡Felicidades! El código ${id} es ganador. Reclama tu premio.</p>`;
-            } else {
-                messageElement.innerHTML = `<p class='loser'>Lo sentimos, el código ${id} no es ganador. ¡Gracias por participar!</p>`;
+        function toggleChatbot() {
+            const chatbot = document.getElementById("chatbot");
+            chatbot.style.display = chatbot.style.display === "block" ? "none" : "block";
+            if (chatbot.style.display === "block") {
+                setTimeout(() => {
+                    addMessage("Chatbot", "¡Hola! ¿En qué puedo ayudarte?\n\nSelecciona una opción:\n1. Horario\n2. Ubicación\n3. Contacto\n4. Hablar con una persona");
+                }, 500);
             }
-        } else {
-            messageElement.innerHTML = "Código QR no válido.";
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById("chatbot-input");
+            const message = input.value.trim();
+            if (message === "") return;
+            
+            addMessage("Tú", message);
+            input.value = "";
+            
+            if (awaitingEmail) {
+                userEmail = message;
+                awaitingEmail = false;
+                awaitingQuestion = true;
+                addMessage("Chatbot", "Por favor, escribe tu pregunta para que un agente la reciba.");
+                return;
+            }
+            
+            if (awaitingQuestion) {
+                awaitingQuestion = false;
+                sendEmail(userEmail, message);
+                addMessage("Chatbot", "Gracias. Tu pregunta ha sido enviada a un agente. Serás contactado pronto a tu correo electrónico: " + userEmail);
+                return;
+            }
+            
+            if (message === "4") {
+                awaitingEmail = true;
+                addMessage("Chatbot", "Por favor, proporciona tu correo electrónico para que podamos responderte.");
+                return;
+            }
+            
+            setTimeout(() => {
+                const response = getResponse(message);
+                addMessage("Chatbot", response);
+            }, 1000);
+        }
+        
+        function sendEmail(email, question) {
+            fetch('https://formspree.io/f/moqzljqj', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, message: question })
+            });
+        }
+        
+        function addMessage(sender, text) {
+            const messageContainer = document.getElementById("chatbot-messages");
+            const messageElement = document.createElement("div");
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${text.replace(/\n/g, '<br>')}`;
+            messageContainer.appendChild(messageElement);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+        
+        function getResponse(message) {
+            const responses = {
+                "1": "Nuestro horario es de 10 AM a 2 AM todos los días.",
+                "2": "Nos encontramos en Av. Reforma #123, Ciudad.",
+                "3": "Puedes contactarnos al +123456789 o en nuestro correo contacto@reformamax.com."
+            };
+            
+            return responses[message] || "Lo siento, no entiendo tu consulta. Selecciona una opción o escribe una pregunta para que la responda una persona.";
         }
     </script>
 </body>
